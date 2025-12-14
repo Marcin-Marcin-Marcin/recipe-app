@@ -1,10 +1,40 @@
+{% load static %}
+
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
     <title>Recipe App Home</title>
+    <link rel="stylesheet" href="{% static 'recipes/styles.css' %}">
 </head>
-<body>
-    <h1>Welcome to the Recipe App</h1>
-    <p>Here you can add, browse, and search your recipes.</p>
+<body class="page">
+    <header class="site-header">
+        <div class="site-header__inner">
+            <h1 class="site-title">Recipe App</h1>
+            <nav class="site-nav">
+                <a href="{% url 'recipes:home' %}" class="nav-link nav-link--active">Home</a>
+                <a href="{% url 'recipes:recipes_overview' %}" class="nav-link">All Recipes</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="hero">
+        <section class="hero__content">
+            <h2 class="hero__title">Welcome to the Recipe App</h2>
+            <p class="hero__text">
+                Discover simple and delicious recipes.
+            </p>
+
+            <a href="{% url 'recipes:recipes_overview' %}" class="btn btn--primary">
+                View all recipes
+            </a>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <p class="site-footer__text">
+            Footer Placeholder
+        </p>
+    </footer>
 </body>
 </html>

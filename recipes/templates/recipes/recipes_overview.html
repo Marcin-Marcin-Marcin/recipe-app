@@ -1,0 +1,66 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>All Recipes</title>
+    <link rel="stylesheet" href="{% static 'recipes/styles.css' %}">
+</head>
+<body class="page">
+    <header class="site-header">
+        <div class="site-header__inner">
+            <h1 class="site-title">Recipe App</h1>
+            <nav class="site-nav">
+                <a href="{% url 'recipes:home' %}" class="nav-link">Home</a>
+                <a href="{% url 'recipes:recipes_overview' %}" class="nav-link nav-link--active">All Recipes</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="content">
+        <section class="content__section">
+            <h2 class="section-title">All Recipes</h2>
+
+            {% if object_list %}
+                <table class="recipe-table">
+                    <thead>
+                        <tr>
+                            <th class="recipe-table__header">Recipe</th>
+                            <th class="recipe-table__header">Image</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for recipe in object_list %}
+                        <tr class="recipe-table__row">
+                            <td class="recipe-table__cell">
+                                <a href="{{ recipe.get_absolute_url }}" class="recipe-link">
+                                    {{ recipe.name }}
+                                </a>
+                            </td>
+                            <td class="recipe-table__cell">
+                                {% if recipe.pic %}
+                                    <img src="{{ recipe.pic.url }}" alt="{{ recipe.name }}" class="recipe-thumb">
+                                {% else %}
+                                    <span class="recipe-no-image">No image</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p class="section-text">
+                    There are no recipes yet. Please add some in the Django admin panel.
+                </p>
+            {% endif %}
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <p class="site-footer__text">
+            Footer Placeholder
+        </p>
+    </footer>
+</body>
+</html>
