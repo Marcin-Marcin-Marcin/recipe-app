@@ -1,0 +1,49 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Logged Out</title>
+    <link rel="stylesheet" href="{% static 'recipes/styles.css' %}">
+</head>
+<body class="page">
+
+<header class="site-header">
+    <div class="site-header__inner">
+        <h1 class="site-title">Recipe App</h1>
+        <nav class="site-nav">
+        <a href="{% url 'recipes:home' %}" class="nav-link">Home</a>
+        <a href="{% url 'recipes:recipes_overview' %}" class="nav-link">All Recipes</a>
+        <a href="{% url 'login' %}" class="nav-link">Login</a>
+      </nav>
+    </div>
+</header>
+
+<main class="content">
+    <section class="content__section" style="text-align:center;">
+        <h2 class="section-title">You’ve successfully logged out</h2>
+
+        <p class="section-text">
+            Thanks for visiting. Your session has ended safely.
+        </p>
+
+        <p class="section-text" style="max-width: 560px; margin: 0 auto;">
+            Tip: next time, try searching for a recipe by category and compare the difficulty levels.
+        </p>
+
+        <div style="margin-top: 20px;">
+            <a href="{% url 'login' %}" class="btn btn--primary">Log in again</a>
+            <a href="{% url 'recipes:home' %}" class="btn btn--secondary" style="margin-left: 10px;">Go to homepage</a>
+        </div>
+    </section>
+</main>
+
+<footer class="site-footer">
+    <p class="site-footer__text">
+        Footer Placeholder
+    </p>
+</footer>
+
+</body>
+</html>

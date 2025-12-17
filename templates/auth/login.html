@@ -1,0 +1,46 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Login</title>
+  <link rel="stylesheet" href="{% static 'recipes/styles.css' %}">
+</head>
+<body class="page">
+  <header class="site-header">
+    <div class="site-header__inner">
+      <h1 class="site-title">Recipe App</h1>
+      <nav class="site-nav">
+        <a href="{% url 'recipes:home' %}" class="nav-link">Home</a>
+        <a href="{% url 'recipes:recipes_overview' %}" class="nav-link">All Recipes</a>
+        <a href="{% url 'login' %}" class="nav-link">Login</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="content">
+    <section class="content__section">
+      <h2 class="section-title">Login</h2>
+
+      {% if error_message %}
+        <p class="section-text">{{ error_message }}</p>
+      {% endif %}
+
+      <form method="POST">
+        {% csrf_token %}
+
+        <input type="hidden" name="next" value="{{ next }}">
+
+        {{ form.as_p }}
+
+        <button type="submit" class="btn btn--primary">Login</button>
+      </form>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p class="site-footer__text">Footer Placeholder</p>
+  </footer>
+</body>
+</html>

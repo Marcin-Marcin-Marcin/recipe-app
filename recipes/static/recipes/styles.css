@@ -238,14 +238,61 @@ body.page {
     margin: 0 auto;
     border-radius: 12px;
     overflow: hidden;
+
     display: flex;
     justify-content: center;
+    align-items: center;
+
+    text-align: center;
 }
 
 .recipe-detail__image {
     width: 100%;
+    max-width: 520px;
     height: auto;
-    max-height: 400px;
+    max-height: 420px;
+
     object-fit: cover;
     display: block;
+    margin: 0 auto;
 }
+.nav-link--logout {
+  margin-left: auto;
+}
+
+/* Auth form styling */
+.content__section form p {
+  margin: 0 0 0.9rem;
+}
+
+.content__section label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+  color: var(--color-phthalo-green);
+}
+
+.content__section input[type="text"],
+.content__section input[type="password"] {
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid rgba(0,0,0,0.15);
+  border-radius: 10px;
+  font-size: 1rem;
+}
+
+.content__section input:focus {
+  outline: none;
+  border-color: var(--color-phthalo-green);
+  box-shadow: 0 0 0 3px rgba(11,59,46,0.12);
+}
+
+.errorlist {
+  margin: 0 0 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  background: var(--color-cream);
+  border: 1px solid rgba(255, 107, 53, 0.427);
+  color: var(--color-black);
+}
+
