@@ -296,3 +296,69 @@ body.page {
   color: var(--color-black);
 }
 
+.recipe-search-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+.recipe-search-table th,
+.recipe-search-table td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #e5e7eb;
+    text-align: left;
+}
+
+.recipe-search-table th {
+    background: #fef3e2;
+    font-weight: 600;
+}
+
+/* Search Results (pandas DataFrame table) */
+
+.recipe-search-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    background: #ffffff;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.recipe-search-table th,
+.recipe-search-table td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #e5e7eb;
+    text-align: left;
+    vertical-align: top;
+}
+
+.recipe-search-table th {
+    background: #fef3e2;
+    font-weight: 600;
+    color: #111827;
+}
+
+.recipe-search-table tr:nth-child(even) {
+    background: #f9fafb;
+}
+
+/* Make links inside the DataFrame table match your app style */
+.recipe-search-table a {
+    color: #006d5b;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.recipe-search-table a:hover {
+    text-decoration: underline;
+}
+
+.content__section select {
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid rgba(0,0,0,0.15);
+  border-radius: 10px;
+  font-size: 1rem;
+  background: #fff;
+}
