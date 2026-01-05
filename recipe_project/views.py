@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import login, logout
 from django.contrib.auth.forms import AuthenticationForm
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.conf import settings
@@ -8,17 +8,20 @@ from django.conf import settings
 def login_view(request):
     error_message = None
 
-    next_url = request.GET.get("next") or "recipes:recipes_overview"
+    # Prefer ?next=/some/path/ but fall back to recipes list
+    next_url = request.GET.get("next") or request.POST.get("next") or "/recipes/"
 
     if request.method == "POST":
         form = AuthenticationForm(data=request.POST)
 
         if form.is_valid():
-            user = form.get_user()
-            login(request, user)
+            login(request, form.get_user())
 
-            next_url = request.POST.get("next") or "recipes:recipes_overview"
-            return redirect(next_url)
+            # Safety: only allow redirects to safe hosts/paths
+            if url_has_allowed_host_and_scheme(next_url, allowed_hosts={request.get_host()}, require_https=request.is_secure()):
+                return redirect(next_url)
+
+            return redirect("/recipes/")
 
         error_message = "Invalid username or password."
     else:
@@ -29,15 +32,13 @@ def login_view(request):
 
 
 def logout_view(request):
-    """
-    Logs the user out and redirects to a 'successfully logged out' page.
-    """
     logout(request)
     return redirect("success")
 
 
 def success_view(request):
-    """
-    Page shown after logging out.
-    """
     return render(request, "auth/success.html")
+
+
+def about_view(request):
+    return render(request, "about.html")

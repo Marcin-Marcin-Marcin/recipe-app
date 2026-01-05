@@ -1,98 +1,63 @@
-{% load static %}
+{% extends "base.html" %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>{{ object.name }} · Recipe Details</title>
-    <link rel="stylesheet" href="{% static 'recipes/styles.css' %}">
-</head>
-<body class="page">
-<header class="site-header">
-    <div class="site-header__inner">
-        <h1 class="site-title">Recipe App</h1>
-        <nav class="site-nav">
-            <a href="{% url 'recipes:home' %}" class="nav-link">Home</a>
-            <a href="{% url 'recipes:recipes_overview' %}" class="nav-link">All Recipes</a>
-            <a href="{% url 'recipes:recipe_search' %}" class="nav-link">Search</a>
+{% block title %}{{ object.name }} · Recipe Details{% endblock %}
 
-            <a href="{% url 'logout' %}" class="nav-link nav-link--logout">Logout</a>
-        </nav>
-    </div>
-</header>
+{% block content %}
+<section class="content__section recipe-detail">
+  <div class="recipe-detail__header">
+    <div class="recipe-detail__text">
+      <h2 class="section-title">{{ object.name }}</h2>
 
-<main class="content">
-    <section class="content__section recipe-detail">
-        <div class="recipe-detail__header">
-            <div class="recipe-detail__text">
-                <h2 class="section-title">{{ object.name }}</h2>
-
-                <div class="recipe-detail__meta">
-                    <p class="recipe-detail__meta-item">
-                        <span class="label">Cooking time:</span>
-                        <span class="value">{{ object.cooking_time }} minutes</span>
-                    </p>
-
-                    <p class="recipe-detail__meta-item">
-                        <span class="label">Difficulty:</span>
-                        <span class="value">{{ difficulty }}</span>
-                    </p>
-
-                    {% if object.category %}
-                        <p class="recipe-detail__meta-item">
-                            <span class="label">Category:</span>
-                            <span class="value">{{ object.category.name }}</span>
-                        </p>
-                    {% endif %}
-                </div>
-            </div>
-
-            <div class="recipe-detail__image-wrapper">
-                {% if object.pic %}
-                    <img src="{{ object.pic.url }}"
-                         alt="{{ object.name }}"
-                         class="recipe-detail__image">
-                {% endif %}
-            </div>
-        </div>
-
-        <div class="recipe-detail__body">
-            <div class="recipe-detail__block">
-                <h3 class="recipe-detail__block-title">Ingredients</h3>
-
-                {% if ingredients_list %}
-                    <ul class="recipe-detail__ingredients-list">
-                        {% for ingredient in ingredients_list %}
-                            <li class="recipe-detail__ingredient">{{ ingredient }}</li>
-                        {% endfor %}
-                    </ul>
-                {% else %}
-                    <p class="recipe-detail__empty">
-                        No ingredients listed yet.
-                    </p>
-                {% endif %}
-            </div>
-
-            <div class="recipe-detail__block">
-                <h3 class="recipe-detail__block-title">Description</h3>
-                <p class="recipe-detail__description">
-                    {{ object.description }}
-                </p>
-            </div>
-        </div>
-
-        <p class="recipe-detail__back">
-            <a href="{% url 'recipes:recipes_overview' %}" class="nav-link">
-                ← Back to all recipes
-            </a>
+      <div class="recipe-detail__meta">
+        <p class="recipe-detail__meta-item">
+          <span class="label">Cooking time:</span>
+          <span class="value">{{ object.cooking_time }} minutes</span>
         </p>
-    </section>
-</main>
 
-<footer class="site-footer">
-    <p class="site-footer__text">
-        Footer Placeholder
-    </p>
-</footer>
-</body>
-</html>
+        <p class="recipe-detail__meta-item">
+          <span class="label">Difficulty:</span>
+          <span class="value">{{ difficulty }}</span>
+        </p>
+
+        {% if object.category %}
+          <p class="recipe-detail__meta-item">
+            <span class="label">Category:</span>
+            <span class="value">{{ object.category.name }}</span>
+          </p>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="recipe-detail__image-wrapper">
+      {% if object.pic %}
+        <img src="{{ object.pic.url }}" alt="{{ object.name }}" class="recipe-detail__image">
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="recipe-detail__body">
+    <div class="recipe-detail__block">
+      <h3 class="recipe-detail__block-title">Ingredients</h3>
+
+      {% if ingredients_list %}
+        <ul class="recipe-detail__ingredients-list">
+          {% for ingredient in ingredients_list %}
+            <li class="recipe-detail__ingredient">{{ ingredient }}</li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="recipe-detail__empty">No ingredients listed yet.</p>
+      {% endif %}
+    </div>
+
+    <div class="recipe-detail__block">
+      <h3 class="recipe-detail__block-title">Description</h3>
+      <p class="recipe-detail__description">{{ object.description }}</p>
+    </div>
+  </div>
+
+  <p class="recipe-detail__back">
+    <a href="{% url 'recipes:recipes_overview' %}" class="recipe-link">← Back to all recipes</a>
+  </p>
+</section>
+{% endblock %}

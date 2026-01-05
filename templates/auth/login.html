@@ -1,58 +1,26 @@
-{% load static %}
+{% extends "base.html" %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>Login · Recipe App</title>
-  <link rel="stylesheet" href="{% static 'recipes/styles.css' %}">
-</head>
-<body class="page">
+{% block title %}Login · Recipe App{% endblock %}
 
-<header class="site-header">
-  <div class="site-header__inner">
-    <h1 class="site-title">Recipe App</h1>
-    <nav class="site-nav">
-      <a href="{% url 'recipes:home' %}" class="nav-link">Home</a>
-      <a href="{% url 'recipes:recipes_overview' %}" class="nav-link">All Recipes</a>
-      <a href="{% url 'login' %}" class="nav-link nav-link--active">Login</a>
-    </nav>
-  </div>
-</header>
+{% block content %}
+<section class="content__section">
+  <h2 class="section-title">Login</h2>
 
-<main class="content">
-  <section class="content__section">
-    <h2 class="section-title">Login</h2>
-
-    <p class="section-text" style="margin-bottom: 1rem;">
-      Please sign in to access recipes and search features.
-    </p>
-
-    {% if error_message %}
-      <ul class="errorlist">
-        <li>{{ error_message }}</li>
-      </ul>
-    {% endif %}
-
-    <form method="POST">
-      {% csrf_token %}
-
-      <input type="hidden" name="next" value="{{ next }}">
-
-      {{ form.as_p }}
-
-      <button type="submit" class="btn btn--primary">
-        Log in
-      </button>
-    </form>
-  </section>
-</main>
-
-<footer class="site-footer">
-  <p class="site-footer__text">
-    Footer Placeholder
+  <p class="section-text" style="margin-bottom: 1rem;">
+    Please sign in to access recipes and search features.
   </p>
-</footer>
 
-</body>
-</html>
+  {% if error_message %}
+    <ul class="errorlist">
+      <li>{{ error_message }}</li>
+    </ul>
+  {% endif %}
+
+  <form method="POST">
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{{ next }}">
+    {{ form.as_p }}
+    <button type="submit" class="btn btn--primary">Log in</button>
+  </form>
+</section>
+{% endblock %}

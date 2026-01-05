@@ -314,7 +314,6 @@ body.page {
     font-weight: 600;
 }
 
-/* Search Results (pandas DataFrame table) */
 
 .recipe-search-table {
     width: 100%;
@@ -343,7 +342,6 @@ body.page {
     background: #f9fafb;
 }
 
-/* Make links inside the DataFrame table match your app style */
 .recipe-search-table a {
     color: #006d5b;
     text-decoration: none;
@@ -361,4 +359,22 @@ body.page {
   border-radius: 10px;
   font-size: 1rem;
   background: #fff;
+}
+
+.site-title__link {
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.site-title__link:hover {
+  text-decoration: underline;
+}
+
+.btn--secondary {
+  background: #ffffff;
+  color: var(--color-phthalo-green);
+  border: 1px solid rgba(11,59,46,0.25);
+}
+.btn--secondary:hover {
+  transform: translateY(-1px);
 }

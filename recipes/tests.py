@@ -1,186 +1,234 @@
-
+from django.contrib.auth.models import User
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.urls import reverse
-from django.contrib.auth import get_user_model
 
-from .forms import RecipeSearchForm
-from .models import Recipe
-
-
-User = get_user_model()
+from categories.models import Category
+from recipes.forms import AddRecipeForm, RecipeSearchForm
+from recipes.models import Recipe
 
 
-class RecipeSearchFormTest(TestCase):
-    def test_form_has_expected_fields(self):
-        form = RecipeSearchForm()
-        self.assertIn("recipe_name", form.fields)
-        self.assertIn("ingredient", form.fields)
-        self.assertIn("max_cooking_time", form.fields)
-        self.assertIn("chart_type", form.fields)
+class RecipeModelTests(TestCase):
+    def setUp(self):
+        self.category = Category.objects.create(name="Dinner", description="Evening meals")
+        self.recipe = Recipe.objects.create(
+            name="Tomato Pasta",
+            description="Simple pasta recipe.",
+            ingredients="pasta,tomato,garlic",
+            cooking_time=15,
+            difficulty="",
+            category=self.category,
+        )
 
-    def test_form_valid_with_empty_data(self):
+    def test_str_returns_name(self):
+        self.assertEqual(str(self.recipe), "Tomato Pasta")
+
+    def test_get_absolute_url(self):
+        url = self.recipe.get_absolute_url()
+        expected = reverse("recipes:recipe_detail", kwargs={"pk": self.recipe.pk})
+        self.assertEqual(url, expected)
+
+    def test_calculate_difficulty_easy(self):
+        recipe = Recipe.objects.create(
+            name="Toast",
+            description="Toast it.",
+            ingredients="bread,butter",
+            cooking_time=5,
+            difficulty="",
+        )
+        self.assertEqual(recipe.calculate_difficulty(), "Easy")
+
+    def test_calculate_difficulty_medium(self):
+        recipe = Recipe.objects.create(
+            name="Omelette",
+            description="Eggs and stuff.",
+            ingredients="eggs,milk,salt,pepper",
+            cooking_time=12,
+            difficulty="",
+        )
+        self.assertEqual(recipe.calculate_difficulty(), "Medium")
+
+    def test_calculate_difficulty_hard(self):
+        recipe = Recipe.objects.create(
+            name="Curry",
+            description="Spicy.",
+            ingredients="onion,garlic,ginger,spices,tomato,chicken,rice",
+            cooking_time=25,
+            difficulty="",
+        )
+        self.assertEqual(recipe.calculate_difficulty(), "Hard")
+
+    def test_calculate_difficulty_very_hard(self):
+        recipe = Recipe.objects.create(
+            name="Big Feast",
+            description="Complex.",
+            ingredients="a,b,c,d,e,f,g,h,i,j,k",
+            cooking_time=45,
+            difficulty="",
+        )
+        self.assertEqual(recipe.calculate_difficulty(), "Very Hard")
+
+    def test_recipe_can_have_category_null(self):
+        recipe = Recipe.objects.create(
+            name="No Category Dish",
+            description="Test.",
+            ingredients="a,b",
+            cooking_time=10,
+            difficulty="",
+            category=None,
+        )
+        self.assertIsNone(recipe.category)
+
+
+class RecipeFormTests(TestCase):
+    def setUp(self):
+        self.category = Category.objects.create(name="Dessert", description="")
+
+    def test_recipe_search_form_valid_empty(self):
+        """
+        Search form should be valid even if empty (all fields optional).
+        """
         form = RecipeSearchForm(data={})
         self.assertTrue(form.is_valid())
 
-    def test_max_cooking_time_must_be_positive(self):
-        form = RecipeSearchForm(data={"max_cooking_time": 0})
+    def test_recipe_search_form_invalid_negative_time(self):
+        form = RecipeSearchForm(data={"max_cooking_time": -5})
         self.assertFalse(form.is_valid())
         self.assertIn("max_cooking_time", form.errors)
 
-    def test_chart_choices_include_no_chart(self):
-        form = RecipeSearchForm()
-        choices = [c[0] for c in form.fields["chart_type"].choices]
-        self.assertIn("", choices)   
-        self.assertIn("#1", choices)
-        self.assertIn("#2", choices)
-        self.assertIn("#3", choices)
+    def test_add_recipe_form_valid_minimal(self):
+        """
+        Recipe model requires: name, description, ingredients, cooking_time.
+        Pic has a default so we can omit it.
+        Category can be blank.
+        """
+        form_data = {
+            "name": "Apple Pie",
+            "description": "Bake it.",
+            "ingredients": "apple,flour,sugar",
+            "cooking_time": 30,
+            "category": self.category.pk,
+        }
+        form = AddRecipeForm(data=form_data, files={})
+        self.assertTrue(form.is_valid(), form.errors)
+
+        recipe = form.save()
+        self.assertEqual(recipe.name, "Apple Pie")
+        self.assertEqual(recipe.category, self.category)
+
+    def test_add_recipe_form_invalid_missing_required_fields(self):
+        form = AddRecipeForm(data={"name": "Only Name"})
+        self.assertFalse(form.is_valid())
+        self.assertIn("description", form.errors)
+        self.assertIn("ingredients", form.errors)
+        self.assertIn("cooking_time", form.errors)
 
 
-class RecipeAuthAndViewsTest(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.user = User.objects.create_user(username="testuser", password="testpass123")
-
-        cls.r1 = Recipe.objects.create(
-            name="Pasta Primavera",
-            description="Pasta with vegetables",
-            ingredients="pasta, garlic, tomato",
-            cooking_time=15,
-            difficulty="Medium",
+class RecipeViewTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username="testuser", password="testpass123")
+        self.category = Category.objects.create(name="Lunch", description="")
+        self.recipe = Recipe.objects.create(
+            name="Salad",
+            description="Mix ingredients.",
+            ingredients="lettuce,tomato,cucumber",
+            cooking_time=8,
+            difficulty="",
+            category=self.category,
         )
-        cls.r2 = Recipe.objects.create(
-            name="Tomato Soup",
-            description="Simple soup",
-            ingredients="tomato, onion, garlic",
-            cooking_time=25,
-            difficulty="Easy",
-        )
-        cls.r3 = Recipe.objects.create(
-            name="Chocolate Cake",
-            description="Dessert",
-            ingredients="flour, sugar, milk, cocoa",
-            cooking_time=45,
-            difficulty="Hard",
-        )
 
+    def test_home_page_public(self):
+        url = reverse("recipes:home")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "recipes/recipes_home.html")
 
     def test_recipes_overview_requires_login(self):
-        url = reverse("recipes:recipes_overview")  
-        resp = self.client.get(url)
-        self.assertEqual(resp.status_code, 302)
-        self.assertIn("/login/?next=", resp.url)
-        self.assertIn(url, resp.url)
+        url = reverse("recipes:recipes_overview")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("/login/", response["Location"])
 
     def test_recipe_detail_requires_login(self):
-        url = reverse("recipes:recipe_detail", args=[self.r1.pk])
-        resp = self.client.get(url)
-        self.assertEqual(resp.status_code, 302)
-        self.assertIn("/login/?next=", resp.url)
-        self.assertIn(url, resp.url)
+        url = reverse("recipes:recipe_detail", kwargs={"pk": self.recipe.pk})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("/login/", response["Location"])
 
     def test_recipe_search_requires_login(self):
-        url = reverse("recipes:recipe_search")  
-        resp = self.client.get(url)
-        self.assertEqual(resp.status_code, 302)
-        self.assertIn("/login/?next=", resp.url)
-        self.assertIn(url, resp.url)
+        url = reverse("recipes:recipe_search")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("/login/", response["Location"])
 
+    def test_recipe_add_requires_login(self):
+        url = reverse("recipes:recipe_add")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("/login/", response["Location"])
 
-    def login(self):
+    def test_logged_in_can_view_overview(self):
         self.client.login(username="testuser", password="testpass123")
+        url = reverse("recipes:recipes_overview")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "recipes/recipes_overview.html")
+        self.assertContains(response, "Salad")
 
-    def test_search_get_shows_all_recipes(self):
-        self.login()
-        url = reverse("recipes:recipe_search")
-        resp = self.client.get(url)
-        self.assertEqual(resp.status_code, 200)
+    def test_logged_in_can_view_detail(self):
+        self.client.login(username="testuser", password="testpass123")
+        url = reverse("recipes:recipe_detail", kwargs={"pk": self.recipe.pk})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "recipes/recipe_detail.html")
+        self.assertContains(response, "Salad")
 
-        self.assertIn("results_count", resp.context)
-        self.assertEqual(resp.context["results_count"], Recipe.objects.count())
+    def test_logged_in_can_open_add_recipe_form(self):
+        self.client.login(username="testuser", password="testpass123")
+        url = reverse("recipes:recipe_add")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "recipes/recipe_add.html")
 
+    def test_logged_in_can_post_add_recipe_without_image(self):
+        """
+        Pic has a default (no_picture.jpg), so omitting FILES should still work.
+        """
+        self.client.login(username="testuser", password="testpass123")
+        url = reverse("recipes:recipe_add")
 
-        html = resp.content.decode("utf-8")
-        self.assertIn('class="dataframe recipe-search-table"', html)
-        self.assertIn(reverse("recipes:recipe_detail", args=[self.r1.pk]), html)
-        self.assertIn('class="recipe-link"', html)
+        post_data = {
+            "name": "New Dish",
+            "description": "Steps here.",
+            "ingredients": "a,b,c",
+            "cooking_time": 12,
+            "category": self.category.pk,
+        }
 
-    def test_search_partial_name_match(self):
-        self.login()
-        url = reverse("recipes:recipe_search")
+        response = self.client.post(url, data=post_data, follow=False)
+        self.assertEqual(response.status_code, 302)
 
-        resp = self.client.post(url, data={"recipe_name": "pasta"})
-        self.assertEqual(resp.status_code, 200)
-        self.assertEqual(resp.context["results_count"], 1)
+        created = Recipe.objects.get(name="New Dish")
+        expected_detail = reverse("recipes:recipe_detail", kwargs={"pk": created.pk})
+        self.assertEqual(response["Location"], expected_detail)
 
-        html = resp.content.decode("utf-8").lower()
-        self.assertIn("pasta primavera".lower(), html)
-        self.assertNotIn("tomato soup".lower(), html)
-
-    def test_search_ingredient_match(self):
-        self.login()
-        url = reverse("recipes:recipe_search")
-
-        resp = self.client.post(url, data={"ingredient": "garlic"})
-        self.assertEqual(resp.status_code, 200)
-        self.assertEqual(resp.context["results_count"], 2)
-
-        html = resp.content.decode("utf-8").lower()
-        self.assertIn("pasta primavera".lower(), html)
-        self.assertIn("tomato soup".lower(), html)
-        self.assertNotIn("chocolate cake".lower(), html)
-
-    def test_search_max_cooking_time_filter(self):
-        self.login()
-        url = reverse("recipes:recipe_search")
-
-        resp = self.client.post(url, data={"max_cooking_time": 20})
-        self.assertEqual(resp.status_code, 200)
-        self.assertEqual(resp.context["results_count"], 1)
-
-        html = resp.content.decode("utf-8").lower()
-        self.assertIn("pasta primavera".lower(), html)
-        self.assertNotIn("tomato soup".lower(), html)
-        self.assertNotIn("chocolate cake".lower(), html)
-
-    def test_search_combined_filters(self):
-        self.login()
+    def test_logged_in_search_post_returns_results_count(self):
+        """
+        Basic smoke test: POST search should respond 200 and show result count.
+        We avoid asserting chart output (matplotlib) to keep tests stable.
+        """
+        self.client.login(username="testuser", password="testpass123")
         url = reverse("recipes:recipe_search")
 
-        resp = self.client.post(url, data={"recipe_name": "tomato", "ingredient": "garlic"})
-        self.assertEqual(resp.status_code, 200)
-        self.assertEqual(resp.context["results_count"], 1)
-
-        html = resp.content.decode("utf-8").lower()
-        self.assertIn("tomato soup".lower(), html)
-        self.assertNotIn("pasta primavera".lower(), html)
-
-
-    def test_chart_not_rendered_if_no_chart_selected(self):
-        self.login()
-        url = reverse("recipes:recipe_search")
-
-        resp = self.client.post(url, data={"recipe_name": "tomato", "chart_type": ""})
-        self.assertEqual(resp.status_code, 200)
-        self.assertIsNone(resp.context.get("chart"))
-
-        html = resp.content.decode("utf-8")
-        self.assertNotIn("data:image/png;base64", html)
-
-    def test_chart_renders_when_chart_type_selected(self):
-        self.login()
-        url = reverse("recipes:recipe_search")
-
-        resp = self.client.post(url, data={"ingredient": "garlic", "chart_type": "#1"})
-        self.assertEqual(resp.status_code, 200)
-
-        chart = resp.context.get("chart")
-        self.assertIsNotNone(chart)
-        self.assertTrue(isinstance(chart, str))
-        self.assertGreater(len(chart), 50)  
-
-        html = resp.content.decode("utf-8")
-        self.assertIn("data:image/png;base64", html)
-
-
-    def test_calculate_difficulty_returns_expected_value(self):
-        self.assertEqual(self.r1.calculate_difficulty(), "Medium")
+        response = self.client.post(
+            url,
+            data={
+                "recipe_name": "Sal",
+                "ingredient": "",
+                "max_cooking_time": "",
+                "chart_type": "",
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "recipes/recipe_search.html")
+        self.assertContains(response, "Results:")

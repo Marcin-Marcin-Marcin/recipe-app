@@ -1,66 +1,37 @@
-{% load static %}
+{% extends "base.html" %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Search Recipes</title>
-    <link rel="stylesheet" href="{% static 'recipes/styles.css' %}">
-</head>
-<body class="page">
-<header class="site-header">
-    <div class="site-header__inner">
-        <h1 class="site-title">Recipe App</h1>
-        <nav class="site-nav">
-            <a href="{% url 'recipes:home' %}" class="nav-link">Home</a>
-            <a href="{% url 'recipes:recipes_overview' %}" class="nav-link">All Recipes</a>
-            <a href="{% url 'recipes:recipe_search' %}" class="nav-link nav-link--active">Search</a>
+{% block title %}Search Recipes · Recipe App{% endblock %}
 
-            <a href="{% url 'logout' %}" class="nav-link nav-link--logout">Logout</a>
-        </nav>
+{% block content %}
+<section class="content__section">
+  <h2 class="section-title">Search Recipes</h2>
+
+  <form method="POST" style="margin-top: 1rem;">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn--primary">Search</button>
+  </form>
+
+  <hr style="margin: 1.5rem 0; border: 0; border-top: 1px solid rgba(0,0,0,0.08);">
+
+  <p class="section-text" style="margin-bottom: 1rem;">Results: {{ results_count }}</p>
+
+  {% if results_df %}
+    <div style="overflow-x: auto;">{{ results_df|safe }}</div>
+  {% else %}
+    <p class="section-text">No results found.</p>
+  {% endif %}
+
+  {% if chart %}
+    <hr style="margin: 1.5rem 0; border: 0; border-top: 1px solid rgba(0,0,0,0.08);">
+    <h3 class="section-title" style="font-size: 1.2rem;">Chart</h3>
+    <div style="overflow-x: auto; text-align: center;">
+      <img
+        src="data:image/png;base64,{{ chart|safe }}"
+        alt="Recipe chart"
+        style="max-width: 100%; height: auto;"
+      >
     </div>
-</header>
-
-<main class="content">
-    <section class="content__section">
-        <h2 class="section-title">Search Recipes</h2>
-
-        <form method="POST" style="margin-top: 1rem;">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit" class="btn btn--primary">Search</button>
-        </form>
-
-        <hr style="margin: 1.5rem 0; border: 0; border-top: 1px solid rgba(0,0,0,0.08);">
-
-        <p class="section-text" style="margin-bottom: 1rem;">
-            Results: {{ results_count }}
-        </p>
-
-        {% if results_df %}
-            <div style="overflow-x: auto;">
-                {{ results_df|safe }}
-            </div>
-        {% else %}
-            <p class="section-text">No results found.</p>
-        {% endif %}
-
-        {% if chart %}
-            <hr style="margin: 1.5rem 0; border: 0; border-top: 1px solid rgba(0,0,0,0.08);">
-            <h3 class="section-title" style="font-size: 1.2rem;">Chart</h3>
-            <div style="overflow-x: auto; text-align: center;">
-                <img
-                    src="data:image/png;base64,{{ chart|safe }}"
-                    alt="Recipe chart"
-                    style="max-width: 100%; height: auto;"
-                >
-            </div>
-        {% endif %}
-    </section>
-</main>
-
-<footer class="site-footer">
-    <p class="site-footer__text">Footer Placeholder</p>
-</footer>
-</body>
-</html>
+  {% endif %}
+</section>
+{% endblock %}

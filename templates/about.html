@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}About Me · Recipe App{% endblock %}
+
+{% block content %}
+<section class="content__section">
+  <h2 class="section-title">About Me</h2>
+
+  <p class="section-text" style="margin-bottom: 1rem;">
+    Hi, I’m Marcin, a UX/UI Designer transitioning into Python/Django development. This Recipe App is a portfolio project.
+  </p>
+
+  <h3 class="section-title" style="font-size: 1.2rem; margin-top: 1.25rem;">Links</h3>
+
+  <ul style="margin: 0; padding-left: 1.2rem; color: var(--color-grey); line-height: 1.8;">
+    <li>
+      Portfolio:
+      <a href="https://marcin-marcin-marcin.github.io/portfolio-website/index.html" target="_blank" rel="noopener" class="recipe-link">My Portfolio</a>
+    </li>
+    <li>
+      GitHub:
+      <a href="https://github.com/Marcin-Marcin-Marcin" target="_blank" rel="noopener" class="recipe-link">github.com/Marcin-Marcin-Marcin</a>
+    </li>
+    <li>
+      Contact (Email):
+      <a href="mailto:mtbiesiada@gmail.com" class="recipe-link">E-mail me</a>
+    </li>
+  </ul>
+
+  <h3 class="section-title" style="font-size: 1.2rem; margin-top: 1.25rem;">What this app includes</h3>
+  <p class="section-text">
+    Authentication, recipe browsing, search with filtering, and data visualization. Logged-in users can also add new recipes.
+  </p>
+</section>
+{% endblock %}

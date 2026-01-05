@@ -1,4 +1,5 @@
 from django import forms
+from .models import Recipe
 
 CHART_CHOICES = (
     ("", "— No chart —"),
@@ -53,9 +54,22 @@ class RecipeSearchForm(forms.Form):
         required=False,
         choices=CHART_CHOICES,
         label="Chart type (optional)",
-        widget=forms.Select(
-            attrs={
-                "class": "form-control",
-            }
-        ),
+        widget=forms.Select(attrs={"class": "form-control"}),
     )
+
+
+class AddRecipeForm(forms.ModelForm):
+    """
+    Simple form for logged-in users to add recipes.
+    """
+
+    class Meta:
+        model = Recipe
+        fields = ["name", "cooking_time", "ingredients", "description", "pic", "category"]
+        widgets = {
+            "name": forms.TextInput(attrs={"class": "form-control", "placeholder": "e.g. Tomato Pasta"}),
+            "cooking_time": forms.NumberInput(attrs={"class": "form-control", "min": 1}),
+            "ingredients": forms.Textarea(attrs={"class": "form-control", "rows": 3, "placeholder": "Comma-separated ingredients"}),
+            "description": forms.Textarea(attrs={"class": "form-control", "rows": 5, "placeholder": "Short recipe description / steps"}),
+            "category": forms.Select(attrs={"class": "form-control"}),
+        }

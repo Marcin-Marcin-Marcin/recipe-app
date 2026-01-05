@@ -1,0 +1,45 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{% block title %}Recipe App{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'recipes/styles.css' %}">
+</head>
+
+<body class="page">
+<header class="site-header">
+  <div class="site-header__inner">
+    <h1 class="site-title"><a href="{% url 'recipes:home' %}" class="site-title__link">Recipe App</a></h1>
+
+    <nav class="site-nav">
+      <a href="{% url 'recipes:home' %}" class="nav-link {% if request.resolver_match.view_name == 'recipes:home' %}nav-link--active{% endif %}">Home</a>
+
+      <a href="{% url 'recipes:recipes_overview' %}" class="nav-link {% if request.resolver_match.view_name == 'recipes:recipes_overview' %}nav-link--active{% endif %}">All Recipes</a>
+
+      <a href="{% url 'recipes:recipe_search' %}" class="nav-link {% if request.resolver_match.view_name == 'recipes:recipe_search' %}nav-link--active{% endif %}">Search</a>
+
+      <a href="{% url 'about' %}" class="nav-link {% if request.resolver_match.view_name == 'about' %}nav-link--active{% endif %}">About Me</a>
+
+      {% if user.is_authenticated %}
+        <a href="{% url 'recipes:recipe_add' %}" class="nav-link {% if request.resolver_match.view_name == 'recipes:recipe_add' %}nav-link--active{% endif %}">Add Recipe</a>
+        <a href="{% url 'logout' %}" class="nav-link nav-link--logout">Logout</a>
+      {% else %}
+        <a href="{% url 'login' %}" class="nav-link {% if request.resolver_match.view_name == 'login' %}nav-link--active{% endif %}">Login</a>
+      {% endif %}
+    </nav>
+  </div>
+</header>
+
+<main class="{% block main_class %}content{% endblock %}">
+  {% block content %}{% endblock %}
+</main>
+
+<footer class="site-footer">
+  <p class="site-footer__text">
+    Footer Placeholder 
+  </p>
+</footer>
+</body>
+</html>

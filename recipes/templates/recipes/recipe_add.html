@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}Add Recipe · Recipe App{% endblock %}
+
+{% block content %}
+<section class="content__section">
+  <h2 class="section-title">Add a New Recipe</h2>
+
+  <p class="section-text" style="margin-bottom: 1rem;">
+    Add a new recipe to the collection. Fields marked by Django as required must be filled in.
+  </p>
+
+  <form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn--primary">Save recipe</button>
+  </form>
+</section>
+{% endblock %}

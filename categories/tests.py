@@ -1,21 +1,12 @@
 from django.test import TestCase
-from .models import Category
+from categories.models import Category
 
 
-class CategoryModelTest(TestCase):
-
-    @classmethod
-    def setUpTestData(cls):
-        Category.objects.create(
-            name="Dessert",
-            description="Sweet dishes"
-        )
-
-    def test_name_label(self):
-        category = Category.objects.get(id=1)
-        field_label = category._meta.get_field('name').verbose_name
-        self.assertEqual(field_label, 'name')
-
+class CategoryModelTests(TestCase):
     def test_str_returns_name(self):
-        category = Category.objects.get(id=1)
+        category = Category.objects.create(name="Dessert", description="Sweet things")
         self.assertEqual(str(category), "Dessert")
+
+    def test_description_can_be_blank(self):
+        category = Category.objects.create(name="Breakfast", description="")
+        self.assertEqual(category.description, "")
